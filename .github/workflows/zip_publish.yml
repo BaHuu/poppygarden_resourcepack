@@ -16,6 +16,14 @@ jobs:
       run: |
         zip -r repo.zip .
         
+    - name: Create Git Tag
+      run: |
+        VERSION=$(date +"%Y-%m-%d")
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git tag $VERSION
+        git push origin $VERSION
+        
     - name: Get Release Tag
       id: get_tag
       run: |

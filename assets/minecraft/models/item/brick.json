@@ -1,0 +1,16 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/brick"
+  },
+  "overrides": [
+    {
+      "predicate": { "custom_model_data": 1000 },
+      "model": "poppygarden:item/watering_can_full"
+    },
+    {
+        "predicate": { "custom_model_data": 1001 },
+        "model": "poppygarden:item/watering_can_empty"
+      }
+  ]
+}

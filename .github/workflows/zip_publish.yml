@@ -14,22 +14,26 @@ jobs:
     
     - name: Zip Repository
       run: |
-        zip -r repo.zip .
+        zip -r poppy_garden.zip .
         
-    - name: Create Git Tag
+    - name: Check for Existing Tag
+      id: check_tag
       run: |
         VERSION=$(date +"%Y-%m-%d")
-        git config --global user.email "github-actions@github.com"
-        git config --global user.name "GitHub Actions"
-        git tag $VERSION
-        git push origin $VERSION
+        if git rev-parse "refs/tags/$VERSION" >/dev/null 2>&1; then
+          echo "::set-output name=RELEASE_TAG::$VERSION"
+        else
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git tag $VERSION
+          git push origin $VERSION
+          echo "::set-output name=RELEASE_TAG::$VERSION"
+        fi
         
-    - name: Get Release Tag
-      id: get_tag
+    - name: Get Release Name
+      id: get_name
       run: |
-        version=$(git describe --tags --abbrev=0)
-        echo "::set-output name=RELEASE_TAG::$version"
-        echo "::set-output name=RELEASE_NAME::Release $version"
+        echo "::set-output name=RELEASE_NAME::Release ${{ steps.check_tag.outputs.RELEASE_TAG }}"
         
     - name: Create Release
       id: create_release
@@ -37,8 +41,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_tag.outputs.RELEASE_TAG }}
-        release_name: ${{ steps.get_tag.outputs.RELEASE_NAME }}
+        tag_name: ${{ steps.check_tag.outputs.RELEASE_TAG }}
+        release_name: ${{ steps.get_name.outputs.RELEASE_NAME }}
         draft: false
         prerelease: false
         
@@ -48,15 +52,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./repo.zip
-        asset_name: repo.zip
+        asset_path: ./poppy_garden.zip
+        asset_name: poppy_garden.zip
         asset_content_type: application/zip
         
     - name: Create Latest Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: ncipollo/release-action@v1
       with:
-        artifacts: 'repo.zip'
+        artifacts: 'poppy_garden.zip'
         tag: latest
         name: Latest Release
         token: ${{ secrets.GITHUB_TOKEN }}

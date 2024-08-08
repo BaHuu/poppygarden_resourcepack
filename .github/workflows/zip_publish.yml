@@ -20,15 +20,21 @@ jobs:
       id: check_tag
       run: |
         VERSION=$(date +"%Y-%m-%d")
-        if git rev-parse "refs/tags/$VERSION" >/dev/null 2>&1; then
-          echo "::set-output name=RELEASE_TAG::$VERSION"
-        else
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git tag $VERSION
-          git push origin $VERSION
-          echo "::set-output name=RELEASE_TAG::$VERSION"
-        fi
+        TAG_EXISTS=true
+        COUNT=0
+
+        while [ "$TAG_EXISTS" = true ]; do
+          if [ $COUNT -eq 0 ]; then
+            TAG="$VERSION"
+          else
+            TAG="$VERSION-$COUNT"
+          fi
+
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            COUNT=$((COUNT + 1))
+          else
+            TAG_EXISTS=false
+          fi
         
     - name: Get Release Name
       id: get_name

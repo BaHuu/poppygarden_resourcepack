@@ -22,19 +22,22 @@ jobs:
         VERSION=$(date +"%Y-%m-%d")
         TAG_EXISTS=true
         COUNT=0
-
+      
         while [ "$TAG_EXISTS" = true ]; do
           if [ $COUNT -eq 0 ]; then
             TAG="$VERSION"
           else
             TAG="$VERSION-$COUNT"
           fi
-
+      
           if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
             COUNT=$((COUNT + 1))
           else
             TAG_EXISTS=false
           fi
+        done
+      
+        echo "::set-output name=tag::$TAG"
         
     - name: Get Release Name
       id: get_name

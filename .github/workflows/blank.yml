@@ -1,0 +1,28 @@
+name: Archive and Push
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch name as needed
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Archive repository
+      run: zip -r poppy_garden.zip .
+
+    - name: Configure git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+    - name: Commit and push the archive
+      run: |
+        git add poppy_garden.zip
+        git commit -m "Update poppy_garden.zip archive"
+        git push origin main

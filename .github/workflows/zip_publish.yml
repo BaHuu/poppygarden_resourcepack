@@ -37,7 +37,7 @@ jobs:
           fi
         done
       
-        echo "::set-output name=tag::$TAG"
+        echo "::set-output name=RELEASE_TAG::$TAG"
         
     - name: Get Release Name
       id: get_name
